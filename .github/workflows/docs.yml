@@ -49,3 +49,4 @@ jobs:
           verbosity: error
           skip: "^http://localhost"
 
+          runs-on: self-hosted
