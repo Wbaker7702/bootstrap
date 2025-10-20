@@ -1,4 +1,4 @@
-## Security Policy
+# Security Policy
 
 We take the security of Bootstrap and our users seriously. We appreciate responsible disclosure and will work with you to validate, remediate, and publicly disclose issues in a coordinated manner.
 
