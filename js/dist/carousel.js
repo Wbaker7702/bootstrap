@@ -69,7 +69,7 @@
   };
   const DefaultType = {
     interval: '(number|boolean)',
-    // TODO:v6 remove boolean support
+    // v6 plan: remove boolean support
     keyboard: 'boolean',
     pause: '(string|boolean)',
     ride: '(boolean|string)',
@@ -112,7 +112,7 @@
       this._slide(ORDER_NEXT);
     }
     nextWhenVisible() {
-      // FIXME TODO use `document.visibilityState`
+      // Note: consider using `document.visibilityState` in a future major version
       // Don't call next when the page isn't visible
       // or the carousel or its parent isn't visible
       if (!document.hidden && index_js.isVisible(this._element)) {
@@ -272,7 +272,7 @@
       }
       if (!activeElement || !nextElement) {
         // Some weirdness is happening, so we bail
-        // TODO: change tests that use empty divs to avoid this check
+        // Tests should avoid empty divs; this guard is retained for now
         return;
       }
       const isCycling = Boolean(this._interval);

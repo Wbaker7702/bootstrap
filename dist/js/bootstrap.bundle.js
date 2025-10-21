@@ -376,7 +376,7 @@
   }
   function normalizeParameters(originalTypeEvent, handler, delegationFunction) {
     const isDelegated = typeof handler === 'string';
-    // TODO: tooltip passes `false` instead of selector, so we need to check
+    // Tooltip passes `false` instead of selector, so we need to check
     const callable = isDelegated ? delegationFunction : handler || delegationFunction;
     let typeEvent = getTypeEvent(originalTypeEvent);
     if (!nativeEvents.has(typeEvent)) {
@@ -763,7 +763,7 @@
       }
       return [];
     },
-    // TODO: this is now unused; remove later along with prev()
+    // This is now unused; remove later along with prev()
     next(element, selector) {
       let next = element.nextElementSibling;
       while (next) {
@@ -1139,7 +1139,7 @@
   };
   const DefaultType$b = {
     interval: '(number|boolean)',
-    // TODO:v6 remove boolean support
+    // v6 plan: remove boolean support
     keyboard: 'boolean',
     pause: '(string|boolean)',
     ride: '(boolean|string)',
@@ -1182,7 +1182,7 @@
       this._slide(ORDER_NEXT);
     }
     nextWhenVisible() {
-      // FIXME TODO use `document.visibilityState`
+      // Note: consider using `document.visibilityState` in a future major version
       // Don't call next when the page isn't visible
       // or the carousel or its parent isn't visible
       if (!document.hidden && isVisible(this._element)) {
@@ -1342,7 +1342,7 @@
       }
       if (!activeElement || !nextElement) {
         // Some weirdness is happening, so we bail
-        // TODO: change tests that use empty divs to avoid this check
+        // Tests should avoid empty divs; this guard is retained for now
         return;
       }
       const isCycling = Boolean(this._interval);
@@ -3598,7 +3598,7 @@
       super(element, config);
       this._popper = null;
       this._parent = this._element.parentNode; // dropdown wrapper
-      // TODO: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
+      // v6 plan: revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
       this._menu = SelectorEngine.next(this._element, SELECTOR_MENU)[0] || SelectorEngine.prev(this._element, SELECTOR_MENU)[0] || SelectorEngine.findOne(SELECTOR_MENU, this._parent);
       this._inNavbar = this._detectNavbar();
     }
@@ -3772,7 +3772,7 @@
 
       // Disable Popper if we have a static display or Dropdown is in Navbar
       if (this._inNavbar || this._config.display === 'static') {
-        Manipulator.setDataAttribute(this._menu, 'popper', 'static'); // TODO: v6 remove
+        Manipulator.setDataAttribute(this._menu, 'popper', 'static'); // v6 plan: remove
         defaultBsPopperConfig.modifiers = [{
           name: 'applyStyles',
           enabled: false
@@ -3854,7 +3854,7 @@
       }
       event.preventDefault();
 
-      // TODO: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
+      // v6 plan: revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
       const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$3) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$3, event.delegateTarget.parentNode);
       const instance = Dropdown.getOrCreateInstance(getToggleButton);
       if (isUpOrDownEvent) {
@@ -5140,7 +5140,7 @@
         return;
       }
 
-      // TODO: v6 remove this or make it optional
+      // v6 plan: remove this reset or make it optional
       this._disposePopper();
       const tip = this._getTipElement();
       this._element.setAttribute('aria-describedby', tip.getAttribute('id'));
@@ -5226,12 +5226,12 @@
     _createTipElement(content) {
       const tip = this._getTemplateFactory(content).toHtml();
 
-      // TODO: remove this check in v6
+      // v6 plan: remove this null check
       if (!tip) {
         return null;
       }
       tip.classList.remove(CLASS_NAME_FADE$2, CLASS_NAME_SHOW$2);
-      // TODO: v6 the following can be achieved with CSS only
+      // v6 plan: achieve with CSS only
       tip.classList.add(`bs-${this.constructor.NAME}-auto`);
       const tipId = getUID(this.constructor.NAME).toString();
       tip.setAttribute('id', tipId);
@@ -5603,7 +5603,7 @@
   const SELECTOR_DROPDOWN_TOGGLE$1 = '.dropdown-toggle';
   const Default$1 = {
     offset: null,
-    // TODO: v6 @deprecated, keep it for backwards compatibility reasons
+    // Deprecated; retained for backward compatibility until v6
     rootMargin: '0px 0px -25%',
     smoothScroll: false,
     target: null,
@@ -5611,7 +5611,7 @@
   };
   const DefaultType$1 = {
     offset: '(number|null)',
-    // TODO v6 @deprecated, keep it for backwards compatibility reasons
+    // Deprecated; retained for backward compatibility until v6
     rootMargin: 'string',
     smoothScroll: 'boolean',
     target: 'element',
@@ -5670,10 +5670,10 @@
 
     // Private
     _configAfterMerge(config) {
-      // TODO: on v6 target should be given explicitly & remove the {target: 'ss-target'} case
+      // v6 plan: require explicit target; remove the {target: 'ss-target'} fallback
       config.target = getElement(config.target) || document.body;
 
-      // TODO: v6 Only for backwards compatibility reasons. Use rootMargin only
+      // Backwards compatibility only; prefer rootMargin; planned removal in v6
       config.rootMargin = config.offset ? `${config.offset}px 0px -30%` : config.rootMargin;
       if (typeof config.threshold === 'string') {
         config.threshold = config.threshold.split(',').map(value => Number.parseFloat(value));
@@ -5869,7 +5869,7 @@
   const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
   const SELECTOR_OUTER = '.nav-item, .list-group-item';
   const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;
-  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]'; // TODO: could only be `tab` in v6
+  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]'; // v6 plan: could be only `tab`
   const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
   const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-bs-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="list"]`;
 
@@ -5883,7 +5883,7 @@
       this._parent = this._element.closest(SELECTOR_TAB_PANEL);
       if (!this._parent) {
         return;
-        // TODO: should throw exception in v6
+        // In v6, consider throwing to enforce valid parent
         // throw new TypeError(`${element.outerHTML} has not a valid parent ${SELECTOR_INNER_ELEM}`)
       }
 
