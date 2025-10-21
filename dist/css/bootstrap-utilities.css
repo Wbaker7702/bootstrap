@@ -398,64 +398,78 @@
 
 .link-violet {
   color: RGBA(var(--bs-violet-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-violet-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-violet-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-violet:hover, .link-violet:focus {
   color: RGBA(162, 125, 248, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(162, 125, 248, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(162, 125, 248, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-fuchsia {
   color: RGBA(var(--bs-fuchsia-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-fuchsia-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-fuchsia-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-fuchsia:hover, .link-fuchsia:focus {
   color: RGBA(225, 107, 242, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(225, 107, 242, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(225, 107, 242, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-rose {
   color: RGBA(var(--bs-rose-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-rose-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-rose-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-rose:hover, .link-rose:focus {
   color: RGBA(246, 101, 126, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(246, 101, 126, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(246, 101, 126, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-amber {
   color: RGBA(var(--bs-amber-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-amber-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-amber-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-amber:hover, .link-amber:focus {
   color: RGBA(247, 177, 60, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(247, 177, 60, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(247, 177, 60, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-lime {
   color: RGBA(var(--bs-lime-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-lime-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-lime-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-lime:hover, .link-lime:focus {
   color: RGBA(157, 214, 69, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(157, 214, 69, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(157, 214, 69, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-emerald {
   color: RGBA(var(--bs-emerald-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-emerald-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-emerald-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-emerald:hover, .link-emerald:focus {
   color: RGBA(64, 199, 154, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(64, 199, 154, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(64, 199, 154, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-sky {
   color: RGBA(var(--bs-sky-rgb), var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(var(--bs-sky-rgb), var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(var(--bs-sky-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-sky:hover, .link-sky:focus {
   color: RGBA(62, 183, 237, var(--bs-link-opacity, 1)) !important;
+  -webkit-text-decoration-color: RGBA(62, 183, 237, var(--bs-link-underline-opacity, 1)) !important;
   text-decoration-color: RGBA(62, 183, 237, var(--bs-link-underline-opacity, 1)) !important;
 }
 
@@ -2315,36 +2329,43 @@
 
 .link-underline-violet {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-violet-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-violet-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
 .link-underline-fuchsia {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-fuchsia-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-fuchsia-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
 .link-underline-rose {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-rose-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-rose-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
 .link-underline-amber {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-amber-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-amber-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
 .link-underline-lime {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-lime-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-lime-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
 .link-underline-emerald {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-emerald-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-emerald-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
 .link-underline-sky {
   --bs-link-underline-opacity: 1;
+  -webkit-text-decoration-color: rgba(var(--bs-sky-rgb), var(--bs-link-underline-opacity)) !important;
   text-decoration-color: rgba(var(--bs-sky-rgb), var(--bs-link-underline-opacity)) !important;
 }
 
