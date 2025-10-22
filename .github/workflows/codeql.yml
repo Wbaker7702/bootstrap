@@ -29,6 +29,9 @@ jobs:
       matrix:
         language: [ javascript ]
         build: [ autobuild, none ]
+    env:
+      SARIF_UPLOAD_URL: ${{ secrets.SARIF_UPLOAD_URL }}
+      SARIF_UPLOAD_TOKEN: ${{ secrets.SARIF_UPLOAD_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -77,10 +80,7 @@ jobs:
           retention-days: 7
 
       - name: Upload SARIF to external dashboard
-        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && secrets.SARIF_UPLOAD_URL != '' && secrets.SARIF_UPLOAD_TOKEN != '' }}
-        env:
-          SARIF_UPLOAD_URL: ${{ secrets.SARIF_UPLOAD_URL }}
-          SARIF_UPLOAD_TOKEN: ${{ secrets.SARIF_UPLOAD_TOKEN }}
+        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && env.SARIF_UPLOAD_URL != '' && env.SARIF_UPLOAD_TOKEN != '' }}
         run: |
           curl -sSf -H "Authorization: Bearer $SARIF_UPLOAD_TOKEN" \
                -H "Content-Type: application/sarif+json" \
