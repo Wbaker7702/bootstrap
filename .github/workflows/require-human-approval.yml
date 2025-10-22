@@ -1,0 +1,118 @@
+name: Require human approval
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+permissions:
+  pull-requests: read
+  contents: read
+  statuses: write
+  checks: write
+
+jobs:
+  require-approval:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compute approval status
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          # Get reviews
+          reviews_json=$(gh api \
+            repos/${OWNER}/${REPO}/pulls/${PR_NUMBER}/reviews \
+            --paginate)
+
+          # Get PR details for author and mergeability context
+          pr_json=$(gh api repos/${OWNER}/${REPO}/pulls/${PR_NUMBER})
+
+          author=$(echo "$pr_json" | jq -r .user.login)
+
+          # Determine approvals from humans (non-bot) excluding author
+          # Keep only the latest state per reviewer
+          approvals=$(echo "$reviews_json" \
+            | jq -r --arg author "$author" '[.[] | select(.state != "COMMENTED")
+              | {user: .user.login, bot: (.user.type == "Bot" or (.user.login | endswith("[bot]"))), state: .state, submitted_at: .submitted_at}]
+              | group_by(.user)
+              | map(sort_by(.submitted_at) | last)
+              | map(select(.state == "APPROVED" and (.bot | not) and .user != $author))
+              | length')
+
+          # Check for unresolved threads (requested changes or open review threads)
+          change_requests=$(echo "$reviews_json" \
+            | jq -r '[.[] | select(.state == "CHANGES_REQUESTED")] | length')
+
+          # Optionally require conversation resolution via GraphQL (unresolved review threads)
+          # Paginate through all review threads to count unresolved ones
+          all_threads_json="[]"
+          cursor=""
+          while : ; do
+            if [ -z "$cursor" ]; then
+              page=$(gh api graphql -F owner="$OWNER" -F repo="$REPO" -F pr="$PR_NUMBER" -f query='
+                query($owner:String!, $repo:String!, $pr:Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    pullRequest(number: $pr) {
+                      reviewThreads(first: 100) {
+                        nodes { isResolved }
+                        pageInfo { hasNextPage endCursor }
+                      }
+                    }
+                  }
+                }')
+            else
+              page=$(gh api graphql -F owner="$OWNER" -F repo="$REPO" -F pr="$PR_NUMBER" -F after="$cursor" -f query='
+                query($owner:String!, $repo:String!, $pr:Int!, $after:String!) {
+                  repository(owner: $owner, name: $repo) {
+                    pullRequest(number: $pr) {
+                      reviewThreads(first: 100, after: $after) {
+                        nodes { isResolved }
+                        pageInfo { hasNextPage endCursor }
+                      }
+                    }
+                  }
+                }')
+            fi
+            nodes=$(echo "$page" | jq '.data.repository.pullRequest.reviewThreads.nodes')
+            all_threads_json=$(jq -s '.[0] + .[1]' <(echo "$all_threads_json") <(echo "$nodes"))
+            has_next=$(echo "$page" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage')
+            if [ "$has_next" != "true" ]; then
+              break
+            fi
+            cursor=$(echo "$page" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor')
+          done
+          unresolved_threads=$(echo "$all_threads_json" | jq '[.[] | select(.isResolved == false)] | length') || unresolved_threads=0
+
+          echo "Approvals: $approvals"
+          echo "Change requests: $change_requests"
+          echo "Unresolved threads: $unresolved_threads"
+
+          if [ "$approvals" -ge 1 ] && [ "$change_requests" -eq 0 ] && [ "$unresolved_threads" -eq 0 ]; then
+            echo "status=success" >> "$GITHUB_OUTPUT"
+            conclusion=success
+            summary="At least one human approval present; no change requests; all threads resolved."
+          else
+            echo "status=failure" >> "$GITHUB_OUTPUT"
+            conclusion=failure
+            summary="Missing human approval or open issues: approvals=$approvals, change_requests=$change_requests, unresolved_threads=$unresolved_threads"
+          fi
+
+          # Create a check run for visibility and optional required status check
+          head_sha=$(echo "$pr_json" | jq -r .head.sha)
+          gh api repos/${OWNER}/${REPO}/check-runs \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -F name='require-human-approval' \
+            -F head_sha="$head_sha" \
+            -F status=completed \
+            -F conclusion="$conclusion" \
+            -F output.title='Require human approval' \
+            -F output.summary="$summary" \
+            -F output.text="This check enforces at least one human approval (excluding author and bots), no CHANGES_REQUESTED, and resolved review threads. Mark this check as Required in branch protection."

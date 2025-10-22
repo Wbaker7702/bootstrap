@@ -1,0 +1,4 @@
+# This repository uses CODEOWNERS to require reviews from designated maintainers.
+# Add additional maintainers or teams to increase reviewer coverage.
+# Example: `src/ @org/team @another-user`
+* @Wbaker7702
