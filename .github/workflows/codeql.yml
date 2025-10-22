@@ -62,9 +62,9 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           mkdir -p pr
-          echo "${{ github.event.pull_request.number }}" > pr/NR
-          echo "${{ github.ref }}" > pr/REF
-          echo "${{ github.sha }}" > pr/SHA
+          echo "${{ github.event.pull_request.number }}" > pr/pr_number.txt
+          echo "${{ github.ref }}" > pr/ref.txt
+          echo "${{ github.sha }}" > pr/sha.txt
 
       - name: Upload SARIF artifact
         if: ${{ github.event_name == 'pull_request' }}
