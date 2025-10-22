@@ -1,0 +1,135 @@
+name: CodeQL SARIF Upload
+
+on:
+  workflow_run:
+    workflows: ["CodeQL"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+  pull-requests: read
+  code-scanning: write
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+          github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Download SARIF artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const runId = context.payload.workflow_run.id;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // List artifacts from the triggering workflow run
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner,
+              repo,
+              run_id: runId,
+              per_page: 100,
+            });
+
+            const sarifArtifacts = artifacts.filter(a => a.name.startsWith('codeql-sarif'));
+            if (sarifArtifacts.length === 0) {
+              core.info('No SARIF artifacts found. Exiting.');
+              return;
+            }
+
+            // Ensure tmp directory exists
+            const tmpDir = path.join(process.env.GITHUB_WORKSPACE, 'tmp');
+            fs.mkdirSync(tmpDir, { recursive: true });
+
+            for (const art of sarifArtifacts) {
+              const download = await github.rest.actions.downloadArtifact({
+                owner,
+                repo,
+                artifact_id: art.id,
+                archive_format: 'zip',
+              });
+
+              const zipPath = path.join(process.env.GITHUB_WORKSPACE, `artifact-${art.id}.zip`);
+              fs.writeFileSync(zipPath, Buffer.from(download.data));
+              core.info(`Saved ${zipPath}`);
+            }
+      - name: Unzip artifacts
+        run: |
+          mkdir -p tmp
+          for z in artifact-*.zip; do
+            [ -f "$z" ] && unzip -o "$z" -d tmp || true
+          done
+      - name: Upload SARIF to Code Scanning
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const zlib = require('zlib');
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Verify PR context from metadata saved by unprivileged job
+            const prDir = path.join(process.env.GITHUB_WORKSPACE, 'tmp');
+            let prNumber = null;
+            try {
+              prNumber = Number(fs.readFileSync(path.join(prDir, 'NR'), 'utf8').toString().trim());
+            } catch {}
+            const ref = prNumber ? `refs/pull/${prNumber}/head` : context.payload.workflow_run.head_branch;
+            const commitSha = context.payload.workflow_run.head_sha;
+
+            // Gather SARIF files
+            function walk(dir) {
+              const files = fs.readdirSync(dir);
+              let sarifs = [];
+              for (const f of files) {
+                const full = path.join(dir, f);
+                const stat = fs.statSync(full);
+                if (stat.isDirectory()) sarifs = sarifs.concat(walk(full));
+                else if (f.endsWith('.sarif')) sarifs.push(full);
+              }
+              return sarifs;
+            }
+
+            const baseDir = path.join(process.env.GITHUB_WORKSPACE, 'tmp');
+            const sarifFiles = fs.existsSync(baseDir) ? walk(baseDir) : [];
+            if (sarifFiles.length === 0) {
+              core.info('No SARIF files found after unzipping.');
+              return;
+            }
+
+            for (const file of sarifFiles) {
+              core.info(`Uploading SARIF: ${file}`);
+              const sarifContent = fs.readFileSync(file, 'utf8');
+
+              // Basic validation to treat artifact as untrusted input
+              try {
+                const parsed = JSON.parse(sarifContent);
+                if (!parsed || typeof parsed !== 'object' || !parsed.runs) {
+                  core.warning(`Skipping invalid SARIF: ${file}`);
+                  continue;
+                }
+              } catch (e) {
+                core.warning(`Skipping non-JSON SARIF: ${file}`);
+                continue;
+              }
+
+              const gz = zlib.gzipSync(Buffer.from(sarifContent, 'utf8')).toString('base64');
+
+              await github.request('POST /repos/{owner}/{repo}/code-scanning/sarifs', {
+                owner,
+                repo,
+                ref,
+                commit_sha: commitSha,
+                sarif: gz,
+                // tool_name is optional; CodeQL will be inferred from SARIF tool driver
+              });
+            }
