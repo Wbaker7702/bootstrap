@@ -39,11 +39,11 @@ jobs:
           # Determine approvals from humans (non-bot) excluding author
           # Keep only the latest state per reviewer
           approvals=$(echo "$reviews_json" \
-            | jq -r '[.[] | select(.state != "COMMENTED")
+            | jq -r --arg author "$author" '[.[] | select(.state != "COMMENTED")
               | {user: .user.login, bot: (.user.type == "Bot" or (.user.login | endswith("[bot]"))), state: .state, submitted_at: .submitted_at}]
               | group_by(.user)
               | map(sort_by(.submitted_at) | last)
-              | map(select(.state == "APPROVED" and (.bot | not) and .user != env.author))
+              | map(select(.state == "APPROVED" and (.bot | not) and .user != $author))
               | length')
 
           # Check for unresolved threads (requested changes or open review threads)
