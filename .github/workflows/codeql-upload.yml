@@ -83,7 +83,7 @@ jobs:
             try {
               prNumber = Number(fs.readFileSync(path.join(prDir, 'NR'), 'utf8').toString().trim());
             } catch (e) { core.warning('Failed to read PR number: ' + e.message); }
-            const ref = prNumber ? `refs/pull/${prNumber}/head` : context.payload.workflow_run.head_branch;
+            const ref = prNumber ? `refs/pull/${prNumber}/head` : `refs/heads/${context.payload.workflow_run.head_branch}`;
             const commitSha = context.payload.workflow_run.head_sha;
 
             // Gather SARIF files
