@@ -51,6 +51,10 @@ Improve readability by suggesting better line breaks.
   This paragraph demonstrates pretty wrapping that reduces orphan words and creates a more polished rag edge across multiple lines of text.
 </p>`} />
 
+<Callout type="warning">
+`text-wrap: pretty` is currently implemented only in Chromium-based browsers and isn’t supported in Firefox or Safari. Treat `.text-pretty` as progressive enhancement—fall back to normal wrapping or `.text-balance`, or feature‑detect or browser‑detect before relying on it (for example `CSS.supports('text-wrap', 'pretty')`). See [MDN compatibility data](https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap#browser_compatibility).
+</Callout>
+
 ## Word break
 
 Prevent long strings of text from breaking your components’ layout by using `.text-break` to set `word-wrap: break-word` and `word-break: break-word`. We use `word-wrap` instead of the more common `overflow-wrap` for wider browser support, and add the deprecated `word-break: break-word` to avoid issues with flex containers.
