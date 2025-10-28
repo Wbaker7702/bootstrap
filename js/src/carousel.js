@@ -62,10 +62,7 @@ const SELECTOR_INDICATORS = '.carousel-indicators'
 const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]'
 const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]'
 
-const KEY_TO_DIRECTION = {
-  [ARROW_LEFT_KEY]: DIRECTION_RIGHT,
-  [ARROW_RIGHT_KEY]: DIRECTION_LEFT
-}
+// Keyboard arrow mapping must respect document direction (LTR/RTL)
 
 const Default = {
   interval: 5000,
@@ -256,11 +253,23 @@ class Carousel extends BaseComponent {
       return
     }
 
-    const direction = KEY_TO_DIRECTION[event.key]
+    const direction = this._getDirectionFromKey(event.key)
     if (direction) {
       event.preventDefault()
       this._slide(this._directionToOrder(direction))
     }
+  }
+
+  _getDirectionFromKey(key) {
+    if (key !== ARROW_LEFT_KEY && key !== ARROW_RIGHT_KEY) {
+      return
+    }
+
+    if (isRTL()) {
+      return key === ARROW_LEFT_KEY ? DIRECTION_LEFT : DIRECTION_RIGHT
+    }
+
+    return key === ARROW_LEFT_KEY ? DIRECTION_RIGHT : DIRECTION_LEFT
   }
 
   _getItemIndex(element) {
