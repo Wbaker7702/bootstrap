@@ -254,7 +254,7 @@ class Carousel extends BaseComponent {
     }
 
     const order = this._getOrderFromKey(event.key)
-    if (!order) {
+    if (order === undefined) {
       return
     }
 
