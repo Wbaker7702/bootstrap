@@ -1,44 +1,89 @@
-name: "CodeQL"
+name: CodeQL
 
 on:
   push:
-    branches:
-      - main
-      - v4-dev
-      - "!dependabot/**"
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-      - v4-dev
-      - "!dependabot/**"
+    branches: [ main ]
   schedule:
-    - cron: "0 2 * * 4"
+    # Run daily at 02:00 UTC
+    - cron: '0 2 * * *'
   workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze (${{ matrix.language }} - ${{ matrix.build }})
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ javascript ]
+        build: [ autobuild, none ]
+    env:
+      SARIF_UPLOAD_URL: ${{ secrets.SARIF_UPLOAD_URL }}
+      SARIF_UPLOAD_TOKEN: ${{ secrets.SARIF_UPLOAD_TOKEN }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@v5
         with:
-          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3.30.6
+        uses: github/codeql-action/init@v4
         with:
-          config-file: ./.github/codeql/codeql-config.yml
-          languages: "javascript"
-          queries: +security-and-quality
+          languages: ${{ matrix.language }}
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3.30.6
+        if: ${{ matrix.build == 'autobuild' }}
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3.30.6
+        uses: github/codeql-action/analyze@v4
         with:
-          category: "/language:javascript"
+          category: '/language:${{ matrix.language }}'
+          output: 'results/${{ matrix.language }}.sarif'
+          upload: ${{ github.event_name != 'pull_request' }}
+
+      - name: Save PR metadata
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          mkdir -p pr
+          echo "${{ github.event.pull_request.number }}" > pr/pr_number.txt
+          echo "${{ github.ref }}" > pr/ref.txt
+          echo "${{ github.sha }}" > pr/sha.txt
+
+      - name: Upload SARIF artifact
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
+        with:
+          name: codeql-sarif-${{ matrix.language }}
+          path: |
+            results/${{ matrix.language }}.sarif
+            pr/
+          retention-days: 7
+
+      - name: Upload SARIF to external dashboard
+        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && env.SARIF_UPLOAD_URL != '' && env.SARIF_UPLOAD_TOKEN != '' }}
+        run: |
+          curl -sSf -H "Authorization: Bearer $SARIF_UPLOAD_TOKEN" \
+               -H "Content-Type: application/sarif+json" \
+               --data-binary @results/${{ matrix.language }}.sarif \
+               "$SARIF_UPLOAD_URL"
