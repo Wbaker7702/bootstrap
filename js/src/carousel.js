@@ -269,7 +269,10 @@ class Carousel extends BaseComponent {
 
     const isLeftKey = key === ARROW_LEFT_KEY
     // In RTL, left → next, right → prev; in LTR, left → prev, right → next
-    return (isRTL() ? !isLeftKey : isLeftKey) ? ORDER_PREV : ORDER_NEXT
+    if (isRTL()) {
+      return isLeftKey ? ORDER_NEXT : ORDER_PREV
+    }
+    return isLeftKey ? ORDER_PREV : ORDER_NEXT
   }
 
   _getItemIndex(element) {
