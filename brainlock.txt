@@ -1,0 +1,21 @@
+BRAINLOCK FILE
+==============
+
+This file represents a brainlock state in the file system.
+Created: $(date)
+Branch: cursor/brainlock-file-operation-4c62
+Status: Active
+
+A brainlock occurs when:
+- File operations are blocked or stuck
+- Processes cannot access files
+- File system becomes unresponsive
+- Deadlocks in file handling
+
+This file can be used to:
+- Test file operation capabilities
+- Verify file system responsiveness
+- Debug file access issues
+- Monitor file system health
+
+Current timestamp: $(date '+%Y-%m-%d %H:%M:%S')

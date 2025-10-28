@@ -29,30 +29,33 @@ jobs:
       matrix:
         language: [ javascript ]
         build: [ autobuild, none ]
+    env:
+      SARIF_UPLOAD_URL: ${{ secrets.SARIF_UPLOAD_URL }}
+      SARIF_UPLOAD_TOKEN: ${{ secrets.SARIF_UPLOAD_TOKEN }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
         if: ${{ matrix.build == 'autobuild' }}
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: '/language:${{ matrix.language }}'
           output: 'results/${{ matrix.language }}.sarif'
@@ -69,6 +72,7 @@ jobs:
       - name: Upload SARIF artifact
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: codeql-sarif-${{ matrix.language }}
           path: |
@@ -77,10 +81,7 @@ jobs:
           retention-days: 7
 
       - name: Upload SARIF to external dashboard
-        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && secrets.SARIF_UPLOAD_URL != '' && secrets.SARIF_UPLOAD_TOKEN != '' }}
-        env:
-          SARIF_UPLOAD_URL: ${{ secrets.SARIF_UPLOAD_URL }}
-          SARIF_UPLOAD_TOKEN: ${{ secrets.SARIF_UPLOAD_TOKEN }}
+        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && env.SARIF_UPLOAD_URL != '' && env.SARIF_UPLOAD_TOKEN != '' }}
         run: |
           curl -sSf -H "Authorization: Bearer $SARIF_UPLOAD_TOKEN" \
                -H "Content-Type: application/sarif+json" \

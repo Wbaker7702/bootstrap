@@ -36,7 +36,7 @@ import { getSlug } from '@libs/utils'
                         class="d-block link-offset-1"
                         href={`${getConfig().github_org}${example.url}/`}
                         target="_blank"
-                        rel="noopener"
+                        rel="noopener noreferrer"
                         id={`starter-${index}`}
                       >
                         {example.name}
@@ -50,7 +50,7 @@ import { getSlug } from '@libs/utils'
                           example.indexPath ? example.indexPath : 'index.html'
                         }`}
                         target="_blank"
-                        rel="noopener"
+                        rel="noopener noreferrer"
                         aria-labelledby={`edit-${index} starter-${index}`}
                       >
                         <svg class="bi flex-shrink-0" aria-hidden="true">
