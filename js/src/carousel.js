@@ -264,7 +264,7 @@ class Carousel extends BaseComponent {
 
   _getOrderFromKey(key) {
     if (key !== ARROW_LEFT_KEY && key !== ARROW_RIGHT_KEY) {
-      return
+      return null
     }
 
     const isLeftKey = key === ARROW_LEFT_KEY
