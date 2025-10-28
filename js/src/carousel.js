@@ -63,6 +63,7 @@ const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]'
 const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]'
 
 // Keyboard handling maps keys directly to order for clarity
+// Keyboard arrow mapping must respect document direction (LTR/RTL)
 
 const Default = {
   interval: 5000,
@@ -271,8 +272,24 @@ class Carousel extends BaseComponent {
     // In RTL, left → next, right → prev; in LTR, left → prev, right → next
     if (isRTL()) {
       return isLeftKey ? ORDER_NEXT : ORDER_PREV
+    const direction = this._getDirectionFromKey(event.key)
+    if (direction) {
+      event.preventDefault()
+      this._slide(this._directionToOrder(direction))
     }
     return isLeftKey ? ORDER_PREV : ORDER_NEXT
+  }
+
+  _getDirectionFromKey(key) {
+    if (key !== ARROW_LEFT_KEY && key !== ARROW_RIGHT_KEY) {
+      return
+    }
+
+    if (isRTL()) {
+      return key === ARROW_LEFT_KEY ? DIRECTION_LEFT : DIRECTION_RIGHT
+    }
+
+    return key === ARROW_LEFT_KEY ? DIRECTION_RIGHT : DIRECTION_LEFT
   }
 
   _getItemIndex(element) {
