@@ -272,11 +272,8 @@ class Carousel extends BaseComponent {
     // In RTL, left → next, right → prev; in LTR, left → prev, right → next
     if (isRTL()) {
       return isLeftKey ? ORDER_NEXT : ORDER_PREV
-    const direction = this._getDirectionFromKey(event.key)
-    if (direction) {
-      event.preventDefault()
-      this._slide(this._directionToOrder(direction))
     }
+
     return isLeftKey ? ORDER_PREV : ORDER_NEXT
   }
 

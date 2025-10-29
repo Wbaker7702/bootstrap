@@ -9,13 +9,7 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Toast = factory(global.BaseComponent, global.EventHandler, global.ComponentFunctions, global.Index));
 })(this, (function (BaseComponent, EventHandler, componentFunctions_js, index_js) { 'use strict';
 
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap toast.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
+  var _Toast;
 
   /**
    * Constants
@@ -167,23 +161,15 @@
     }
 
     // Static
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Toast.getOrCreateInstance(this, config);
-        if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
-            throw new TypeError(`No method named "${config}"`);
-          }
-          data[config](this);
-        }
-      });
-    }
   }
 
   /**
    * Data API implementation
    */
-
+  _Toast = Toast;
+  Toast.jQueryInterface = componentFunctions_js.getjQueryInterface(_Toast, {
+    passElement: true
+  });
   componentFunctions_js.enableDismissTrigger(Toast);
 
   /**

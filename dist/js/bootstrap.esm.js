@@ -759,7 +759,6 @@ const SelectorEngine = {
     }
     return [];
   },
-  // This is now unused; remove later along with prev()
   next(element, selector) {
     let next = element.nextElementSibling;
     while (next) {
@@ -815,14 +814,31 @@ const enableDismissTrigger = (component, method = 'hide') => {
     instance[method]();
   });
 };
+const getjQueryInterface = (componentClass, options = {}) => {
+  const {
+    // Whether to pass the element (this) as first argument to the method
+    passElement = false,
+    // Function to transform config before passing to getOrCreateInstance
+    configTransform = null
+  } = options;
+  return function (...args) {
+    return this.each(function () {
+      const config = args[0];
+      const instanceConfig = configTransform ? configTransform(config) : config;
+      const data = componentClass.getOrCreateInstance(this, instanceConfig);
+      if (typeof config !== 'string') {
+        return;
+      }
+      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+        throw new TypeError(`No method named "${config}"`);
+      }
+      const methodArgs = passElement ? [this, ...args.slice(1)] : args.slice(1);
+      data[config](...methodArgs);
+    });
+  };
+};
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap alert.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Alert;
 
 /**
  * Constants
@@ -865,24 +881,15 @@ class Alert extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Alert.getOrCreateInstance(this);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config](this);
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_Alert = Alert;
+Alert.jQueryInterface = getjQueryInterface(_Alert, {
+  passElement: true
+});
 enableDismissTrigger(Alert, 'close');
 
 /**
@@ -1121,10 +1128,10 @@ const SELECTOR_ITEM_IMG = '.carousel-item img';
 const SELECTOR_INDICATORS = '.carousel-indicators';
 const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]';
 const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]';
-const KEY_TO_DIRECTION = {
-  [ARROW_LEFT_KEY$1]: DIRECTION_RIGHT,
-  [ARROW_RIGHT_KEY$1]: DIRECTION_LEFT
-};
+
+// Keyboard handling maps keys directly to order for clarity
+// Keyboard arrow mapping must respect document direction (LTR/RTL)
+
 const Default$b = {
   interval: 5000,
   keyboard: true,
@@ -1283,11 +1290,32 @@ class Carousel extends BaseComponent {
     if (/input|textarea/i.test(event.target.tagName)) {
       return;
     }
-    const direction = KEY_TO_DIRECTION[event.key];
-    if (direction) {
-      event.preventDefault();
-      this._slide(this._directionToOrder(direction));
+    const order = this._getOrderFromKey(event.key);
+    if (order === undefined) {
+      return;
     }
+    event.preventDefault();
+    this._slide(order);
+  }
+  _getOrderFromKey(key) {
+    if (key !== ARROW_LEFT_KEY$1 && key !== ARROW_RIGHT_KEY$1) {
+      return null;
+    }
+    const isLeftKey = key === ARROW_LEFT_KEY$1;
+    // In RTL, left → next, right → prev; in LTR, left → prev, right → next
+    if (isRTL()) {
+      return isLeftKey ? ORDER_NEXT : ORDER_PREV;
+    }
+    return isLeftKey ? ORDER_PREV : ORDER_NEXT;
+  }
+  _getDirectionFromKey(key) {
+    if (key !== ARROW_LEFT_KEY$1 && key !== ARROW_RIGHT_KEY$1) {
+      return;
+    }
+    if (isRTL()) {
+      return key === ARROW_LEFT_KEY$1 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+    }
+    return key === ARROW_LEFT_KEY$1 ? DIRECTION_RIGHT : DIRECTION_LEFT;
   }
   _getItemIndex(element) {
     return this._getItems().indexOf(element);
@@ -1448,13 +1476,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API$3, () => {
 
 defineJQueryPlugin(Carousel);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap collapse.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Collapse;
 
 /**
  * Constants
@@ -1643,27 +1665,22 @@ class Collapse extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    const _config = {};
-    if (typeof config === 'string' && /show|hide/.test(config)) {
-      _config.toggle = false;
-    }
-    return this.each(function () {
-      const data = Collapse.getOrCreateInstance(this, _config);
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config]();
-      }
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_Collapse = Collapse;
+Collapse.jQueryInterface = getjQueryInterface(_Collapse, {
+  configTransform(config) {
+    if (typeof config === 'string' && /show|hide/.test(config)) {
+      return {
+        toggle: false
+      };
+    }
+    return config;
+  }
+});
 EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$4, function (event) {
   // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
   if (event.target.tagName === 'A' || event.delegateTarget && event.delegateTarget.tagName === 'A') {
@@ -1682,13 +1699,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$4, functi
 
 defineJQueryPlugin(Collapse);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap dropdown.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Dropdown;
 
 /**
  * Constants
@@ -1957,18 +1968,7 @@ class Dropdown extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Dropdown.getOrCreateInstance(this, config);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config]();
-    });
-  }
+
   static clearMenus(event) {
     if (event.button === RIGHT_MOUSE_BUTTON || event.type === 'keyup' && event.key !== TAB_KEY$1) {
       return;
@@ -2034,7 +2034,8 @@ class Dropdown extends BaseComponent {
 /**
  * Data API implementation
  */
-
+_Dropdown = Dropdown;
+Dropdown.jQueryInterface = getjQueryInterface(_Dropdown);
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE$3, Dropdown.dataApiKeydownHandler);
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_MENU, Dropdown.dataApiKeydownHandler);
 EventHandler.on(document, EVENT_CLICK_DATA_API$3, Dropdown.clearMenus);
@@ -2370,13 +2371,7 @@ class ScrollBarHelper {
   }
 }
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap modal.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Modal;
 
 /**
  * Constants
@@ -2624,24 +2619,13 @@ class Modal extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config, relatedTarget) {
-    return this.each(function () {
-      const data = Modal.getOrCreateInstance(this, config);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config](relatedTarget);
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_Modal = Modal;
+Modal.jQueryInterface = getjQueryInterface(_Modal);
 EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$2, function (event) {
   const target = SelectorEngine.getElementFromSelector(this);
   if (['A', 'AREA'].includes(this.tagName)) {
@@ -2675,13 +2659,7 @@ enableDismissTrigger(Modal);
 
 defineJQueryPlugin(Modal);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap offcanvas.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Offcanvas;
 
 /**
  * Constants
@@ -2845,24 +2823,15 @@ class Offcanvas extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Offcanvas.getOrCreateInstance(this, config);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config](this);
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_Offcanvas = Offcanvas;
+Offcanvas.jQueryInterface = getjQueryInterface(_Offcanvas, {
+  passElement: true
+});
 EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_DATA_TOGGLE$1, function (event) {
   const target = SelectorEngine.getElementFromSelector(this);
   if (['A', 'AREA'].includes(this.tagName)) {
@@ -3137,13 +3106,7 @@ class TemplateFactory extends Config {
   }
 }
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap tooltip.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Tooltip;
 
 /**
  * Constants
@@ -3629,33 +3592,16 @@ class Tooltip extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Tooltip.getOrCreateInstance(this, config);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config]();
-    });
-  }
 }
 
 /**
  * jQuery
  */
-
+_Tooltip = Tooltip;
+Tooltip.jQueryInterface = getjQueryInterface(_Tooltip);
 defineJQueryPlugin(Tooltip);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap popover.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Popover;
 
 /**
  * Constants
@@ -3710,33 +3656,16 @@ class Popover extends Tooltip {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Popover.getOrCreateInstance(this, config);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config]();
-    });
-  }
 }
 
 /**
  * jQuery
  */
-
+_Popover = Popover;
+Popover.jQueryInterface = getjQueryInterface(_Popover);
 defineJQueryPlugin(Popover);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap scrollspy.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _ScrollSpy;
 
 /**
  * Constants
@@ -3960,24 +3889,13 @@ class ScrollSpy extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = ScrollSpy.getOrCreateInstance(this, config);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config]();
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_ScrollSpy = ScrollSpy;
+ScrollSpy.jQueryInterface = getjQueryInterface(_ScrollSpy);
 EventHandler.on(window, EVENT_LOAD_DATA_API$1, () => {
   for (const spy of SelectorEngine.find(SELECTOR_DATA_SPY)) {
     ScrollSpy.getOrCreateInstance(spy);
@@ -3990,13 +3908,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API$1, () => {
 
 defineJQueryPlugin(ScrollSpy);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap tab.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Tab;
 
 /**
  * Constants
@@ -4218,24 +4130,13 @@ class Tab extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Tab.getOrCreateInstance(this);
-      if (typeof config !== 'string') {
-        return;
-      }
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`);
-      }
-      data[config]();
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_Tab = Tab;
+Tab.jQueryInterface = getjQueryInterface(_Tab);
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
   if (['A', 'AREA'].includes(this.tagName)) {
     event.preventDefault();
@@ -4260,13 +4161,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 
 defineJQueryPlugin(Tab);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap toast.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
+var _Toast;
 
 /**
  * Constants
@@ -4418,23 +4313,15 @@ class Toast extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Toast.getOrCreateInstance(this, config);
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config](this);
-      }
-    });
-  }
 }
 
 /**
  * Data API implementation
  */
-
+_Toast = Toast;
+Toast.jQueryInterface = getjQueryInterface(_Toast, {
+  passElement: true
+});
 enableDismissTrigger(Toast);
 
 /**

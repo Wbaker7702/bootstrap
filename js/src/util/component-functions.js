@@ -30,6 +30,35 @@ const enableDismissTrigger = (component, method = 'hide') => {
   })
 }
 
+const getjQueryInterface = (componentClass, options = {}) => {
+  const {
+    // Whether to pass the element (this) as first argument to the method
+    passElement = false,
+    // Function to transform config before passing to getOrCreateInstance
+    configTransform = null
+  } = options
+
+  return function (...args) {
+    return this.each(function () {
+      const config = args[0]
+      const instanceConfig = configTransform ? configTransform(config) : config
+      const data = componentClass.getOrCreateInstance(this, instanceConfig)
+
+      if (typeof config !== 'string') {
+        return
+      }
+
+      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+        throw new TypeError(`No method named "${config}"`)
+      }
+
+      const methodArgs = passElement ? [this, ...args.slice(1)] : args.slice(1)
+      data[config](...methodArgs)
+    })
+  }
+}
+
 export {
-  enableDismissTrigger
+  enableDismissTrigger,
+  getjQueryInterface
 }

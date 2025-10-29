@@ -7,7 +7,7 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
-import { enableDismissTrigger } from './util/component-functions.js'
+import { enableDismissTrigger, getjQueryInterface } from './util/component-functions.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -55,21 +55,7 @@ class Alert extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Alert.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](this)
-    })
-  }
+  static jQueryInterface = getjQueryInterface(Alert, { passElement: true })
 }
 
 /**

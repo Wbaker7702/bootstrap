@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { getjQueryInterface } from './util/component-functions.js'
 import { defineJQueryPlugin, getNextActiveElement, isDisabled } from './util/index.js'
 
 /**
@@ -265,21 +266,7 @@ class Tab extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Tab.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config]()
-    })
-  }
+  static jQueryInterface = getjQueryInterface(Tab)
 }
 
 /**
