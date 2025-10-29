@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { getjQueryInterface } from './util/component-functions.js'
 import {
   defineJQueryPlugin,
   getElement,
@@ -253,24 +254,15 @@ class Collapse extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    const _config = {}
-    if (typeof config === 'string' && /show|hide/.test(config)) {
-      _config.toggle = false
-    }
-
-    return this.each(function () {
-      const data = Collapse.getOrCreateInstance(this, _config)
-
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`)
-        }
-
-        data[config]()
+  static jQueryInterface = getjQueryInterface(Collapse, {
+    configTransform(config) {
+      if (typeof config === 'string' && /show|hide/.test(config)) {
+        return { toggle: false }
       }
-    })
-  }
+
+      return config
+    }
+  })
 }
 
 /**

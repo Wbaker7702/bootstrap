@@ -9,13 +9,7 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Alert = factory(global.BaseComponent, global.EventHandler, global.ComponentFunctions, global.Index));
 })(this, (function (BaseComponent, EventHandler, componentFunctions_js, index_js) { 'use strict';
 
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap alert.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
+  var _Alert;
 
   /**
    * Constants
@@ -58,24 +52,15 @@
     }
 
     // Static
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Alert.getOrCreateInstance(this);
-        if (typeof config !== 'string') {
-          return;
-        }
-        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config](this);
-      });
-    }
   }
 
   /**
    * Data API implementation
    */
-
+  _Alert = Alert;
+  Alert.jQueryInterface = componentFunctions_js.getjQueryInterface(_Alert, {
+    passElement: true
+  });
   componentFunctions_js.enableDismissTrigger(Alert, 'close');
 
   /**

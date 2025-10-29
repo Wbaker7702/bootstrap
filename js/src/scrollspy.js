@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { getjQueryInterface } from './util/component-functions.js'
 import {
   defineJQueryPlugin, getElement, isDisabled, isVisible
 } from './util/index.js'
@@ -260,21 +261,7 @@ class ScrollSpy extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = ScrollSpy.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config]()
-    })
-  }
+  static jQueryInterface = getjQueryInterface(ScrollSpy)
 }
 
 /**
