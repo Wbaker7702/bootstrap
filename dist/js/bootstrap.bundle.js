@@ -134,6 +134,10 @@
       transitionDuration,
       transitionDelay
     } = window.getComputedStyle(element);
+
+    // If multiple durations are defined, take the first
+    transitionDuration = transitionDuration.split(',')[0];
+    transitionDelay = transitionDelay.split(',')[0];
     const floatTransitionDuration = Number.parseFloat(transitionDuration);
     const floatTransitionDelay = Number.parseFloat(transitionDelay);
 
@@ -141,11 +145,7 @@
     if (!floatTransitionDuration && !floatTransitionDelay) {
       return 0;
     }
-
-    // If multiple durations are defined, take the first
-    transitionDuration = transitionDuration.split(',')[0];
-    transitionDelay = transitionDelay.split(',')[0];
-    return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER;
+    return (floatTransitionDuration + floatTransitionDelay) * MILLISECONDS_MULTIPLIER;
   };
   const triggerTransitionEnd = element => {
     element.dispatchEvent(new Event(TRANSITION_END));
@@ -757,6 +757,9 @@
     }
     return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null;
   };
+
+  // Cache the focusable elements selector to avoid recreating it on every call
+  const focusableElementsSelector = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
   const SelectorEngine = {
     find(selector, element = document.documentElement) {
       // Use Array.from for better performance than spread operator
@@ -802,8 +805,7 @@
       return [];
     },
     focusableChildren(element) {
-      const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
-      return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
+      return this.find(focusableElementsSelector, element).filter(el => !isDisabled(el) && isVisible(el));
     },
     getSelectorFromElement(element) {
       const selector = getSelector(element);

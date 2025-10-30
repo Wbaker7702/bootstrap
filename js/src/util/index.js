@@ -80,6 +80,10 @@ const getTransitionDurationFromElement = element => {
   // Get transition-duration of the element
   let { transitionDuration, transitionDelay } = window.getComputedStyle(element)
 
+  // If multiple durations are defined, take the first
+  transitionDuration = transitionDuration.split(',')[0]
+  transitionDelay = transitionDelay.split(',')[0]
+
   const floatTransitionDuration = Number.parseFloat(transitionDuration)
   const floatTransitionDelay = Number.parseFloat(transitionDelay)
 
@@ -88,11 +92,7 @@ const getTransitionDurationFromElement = element => {
     return 0
   }
 
-  // If multiple durations are defined, take the first
-  transitionDuration = transitionDuration.split(',')[0]
-  transitionDelay = transitionDelay.split(',')[0]
-
-  return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER
+  return (floatTransitionDuration + floatTransitionDelay) * MILLISECONDS_MULTIPLIER
 }
 
 const triggerTransitionEnd = element => {

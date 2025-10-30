@@ -32,6 +32,18 @@ const getSelector = element => {
   return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null
 }
 
+// Cache the focusable elements selector to avoid recreating it on every call
+const focusableElementsSelector = [
+  'a',
+  'button',
+  'input',
+  'textarea',
+  'select',
+  'details',
+  '[tabindex]',
+  '[contenteditable="true"]'
+].map(selector => `${selector}:not([tabindex^="-"])`).join(',')
+
 const SelectorEngine = {
   find(selector, element = document.documentElement) {
     // Use Array.from for better performance than spread operator
@@ -91,18 +103,7 @@ const SelectorEngine = {
   },
 
   focusableChildren(element) {
-    const focusables = [
-      'a',
-      'button',
-      'input',
-      'textarea',
-      'select',
-      'details',
-      '[tabindex]',
-      '[contenteditable="true"]'
-    ].map(selector => `${selector}:not([tabindex^="-"])`).join(',')
-
-    return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el))
+    return this.find(focusableElementsSelector, element).filter(el => !isDisabled(el) && isVisible(el))
   },
 
   getSelectorFromElement(element) {
