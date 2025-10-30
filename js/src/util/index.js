@@ -9,18 +9,37 @@ const MAX_UID = 1_000_000
 const MILLISECONDS_MULTIPLIER = 1000
 const TRANSITION_END = 'transitionend'
 
+// Cache for parsed selectors to avoid repeated regex operations
+const selectorCache = new Map()
+
 /**
  * Properly escape IDs selectors to handle weird IDs
  * @param {string} selector
  * @returns {string}
  */
 const parseSelector = selector => {
-  if (selector && window.CSS && window.CSS.escape) {
-    // document.querySelector needs escaping to handle IDs (html5+) containing for instance /
-    selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`)
+  if (!selector) {
+    return selector
   }
 
-  return selector
+  // Return cached result if available
+  if (selectorCache.has(selector)) {
+    return selectorCache.get(selector)
+  }
+
+  let parsedSelector = selector
+
+  if (window.CSS && window.CSS.escape) {
+    // document.querySelector needs escaping to handle IDs (html5+) containing for instance /
+    parsedSelector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`)
+  }
+
+  // Cache the result (limit cache size to prevent memory issues)
+  if (selectorCache.size < 100) {
+    selectorCache.set(selector, parsedSelector)
+  }
+
+  return parsedSelector
 }
 
 // Shout-out Angus Croll (https://goo.gl/pxwQGp)
@@ -37,8 +56,17 @@ const toType = object => {
  */
 
 const getUID = prefix => {
+  const startingPrefix = prefix
+  let attempts = 0
+  const maxAttempts = 10000 // Prevent infinite loop
+
   do {
-    prefix += Math.floor(Math.random() * MAX_UID)
+    prefix = startingPrefix + Math.floor(Math.random() * MAX_UID)
+    attempts++
+
+    if (attempts > maxAttempts) {
+      throw new Error('Unable to generate unique ID after maximum attempts')
+    }
   } while (document.getElementById(prefix))
 
   return prefix
@@ -52,6 +80,10 @@ const getTransitionDurationFromElement = element => {
   // Get transition-duration of the element
   let { transitionDuration, transitionDelay } = window.getComputedStyle(element)
 
+  // If multiple durations are defined, take the first
+  transitionDuration = transitionDuration.split(',')[0]
+  transitionDelay = transitionDelay.split(',')[0]
+
   const floatTransitionDuration = Number.parseFloat(transitionDuration)
   const floatTransitionDelay = Number.parseFloat(transitionDelay)
 
@@ -60,11 +92,7 @@ const getTransitionDurationFromElement = element => {
     return 0
   }
 
-  // If multiple durations are defined, take the first
-  transitionDuration = transitionDuration.split(',')[0]
-  transitionDelay = transitionDelay.split(',')[0]
-
-  return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER
+  return (floatTransitionDuration + floatTransitionDelay) * MILLISECONDS_MULTIPLIER
 }
 
 const triggerTransitionEnd = element => {

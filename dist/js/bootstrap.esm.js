@@ -64,17 +64,34 @@ const MAX_UID = 1000000;
 const MILLISECONDS_MULTIPLIER = 1000;
 const TRANSITION_END = 'transitionend';
 
+// Cache for parsed selectors to avoid repeated regex operations
+const selectorCache = new Map();
+
 /**
  * Properly escape IDs selectors to handle weird IDs
  * @param {string} selector
  * @returns {string}
  */
 const parseSelector = selector => {
-  if (selector && window.CSS && window.CSS.escape) {
-    // document.querySelector needs escaping to handle IDs (html5+) containing for instance /
-    selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`);
+  if (!selector) {
+    return selector;
   }
-  return selector;
+
+  // Return cached result if available
+  if (selectorCache.has(selector)) {
+    return selectorCache.get(selector);
+  }
+  let parsedSelector = selector;
+  if (window.CSS && window.CSS.escape) {
+    // document.querySelector needs escaping to handle IDs (html5+) containing for instance /
+    parsedSelector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`);
+  }
+
+  // Cache the result (limit cache size to prevent memory issues)
+  if (selectorCache.size < 100) {
+    selectorCache.set(selector, parsedSelector);
+  }
+  return parsedSelector;
 };
 
 // Shout-out Angus Croll (https://goo.gl/pxwQGp)
@@ -90,8 +107,16 @@ const toType = object => {
  */
 
 const getUID = prefix => {
+  const startingPrefix = prefix;
+  let attempts = 0;
+  const maxAttempts = 10000; // Prevent infinite loop
+
   do {
-    prefix += Math.floor(Math.random() * MAX_UID);
+    prefix = startingPrefix + Math.floor(Math.random() * MAX_UID);
+    attempts++;
+    if (attempts > maxAttempts) {
+      throw new Error('Unable to generate unique ID after maximum attempts');
+    }
   } while (document.getElementById(prefix));
   return prefix;
 };
@@ -105,6 +130,10 @@ const getTransitionDurationFromElement = element => {
     transitionDuration,
     transitionDelay
   } = window.getComputedStyle(element);
+
+  // If multiple durations are defined, take the first
+  transitionDuration = transitionDuration.split(',')[0];
+  transitionDelay = transitionDelay.split(',')[0];
   const floatTransitionDuration = Number.parseFloat(transitionDuration);
   const floatTransitionDelay = Number.parseFloat(transitionDelay);
 
@@ -112,11 +141,7 @@ const getTransitionDurationFromElement = element => {
   if (!floatTransitionDuration && !floatTransitionDelay) {
     return 0;
   }
-
-  // If multiple durations are defined, take the first
-  transitionDuration = transitionDuration.split(',')[0];
-  transitionDelay = transitionDelay.split(',')[0];
-  return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER;
+  return (floatTransitionDuration + floatTransitionDelay) * MILLISECONDS_MULTIPLIER;
 };
 const triggerTransitionEnd = element => {
   element.dispatchEvent(new Event(TRANSITION_END));
@@ -348,14 +373,12 @@ function bootstrapHandler(element, fn) {
 }
 function bootstrapDelegationHandler(element, selector, fn) {
   return function handler(event) {
-    const domElements = element.querySelectorAll(selector);
+    // Use matches() instead of querySelectorAll for better performance
+    // This avoids querying all matching elements on every event
     for (let {
       target
     } = event; target && target !== this; target = target.parentNode) {
-      for (const domElement of domElements) {
-        if (domElement !== target) {
-          continue;
-        }
+      if (target.matches && target.matches(selector)) {
         hydrateObj(event, {
           delegateTarget: target
         });
@@ -730,22 +753,30 @@ const getSelector = element => {
   }
   return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null;
 };
+
+// Cache the focusable elements selector to avoid recreating it on every call
+const focusableElementsSelector = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
 const SelectorEngine = {
   find(selector, element = document.documentElement) {
-    return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
+    // Use Array.from for better performance than spread operator
+    return Array.from(Element.prototype.querySelectorAll.call(element, selector));
   },
   findOne(selector, element = document.documentElement) {
     return Element.prototype.querySelector.call(element, selector);
   },
   children(element, selector) {
-    return [].concat(...element.children).filter(child => child.matches(selector));
+    // Use Array.from instead of spread operator for better performance
+    return Array.from(element.children).filter(child => child.matches(selector));
   },
   parents(element, selector) {
     const parents = [];
-    let ancestor = element.parentNode.closest(selector);
-    while (ancestor) {
-      parents.push(ancestor);
-      ancestor = ancestor.parentNode.closest(selector);
+    // Start from parent and traverse up, avoiding redundant closest() calls
+    let ancestor = element.parentNode;
+    while (ancestor && ancestor.nodeType === Node.ELEMENT_NODE) {
+      if (ancestor.matches(selector)) {
+        parents.push(ancestor);
+      }
+      ancestor = ancestor.parentNode;
     }
     return parents;
   },
@@ -770,8 +801,7 @@ const SelectorEngine = {
     return [];
   },
   focusableChildren(element) {
-    const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
-    return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
+    return this.find(focusableElementsSelector, element).filter(el => !isDisabled(el) && isVisible(el));
   },
   getSelectorFromElement(element) {
     const selector = getSelector(element);

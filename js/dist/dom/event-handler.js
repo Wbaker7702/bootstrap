@@ -58,14 +58,12 @@
   }
   function bootstrapDelegationHandler(element, selector, fn) {
     return function handler(event) {
-      const domElements = element.querySelectorAll(selector);
+      // Use matches() instead of querySelectorAll for better performance
+      // This avoids querying all matching elements on every event
       for (let {
         target
       } = event; target && target !== this; target = target.parentNode) {
-        for (const domElement of domElements) {
-          if (domElement !== target) {
-            continue;
-          }
+        if (target.matches && target.matches(selector)) {
           hydrateObj(event, {
             delegateTarget: target
           });
