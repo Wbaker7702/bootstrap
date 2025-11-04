@@ -177,6 +177,7 @@
     "stylelint": "^16.25.0",
     "stylelint-config-twbs-bootstrap": "^16.1.0",
     "terser": "^5.44.0",
+    "typescript": "^5.9.3",
     "unist-util-visit": "^5.0.0",
     "vnu-jar": "25.11.3",
     "zod": "^4.1.12"
