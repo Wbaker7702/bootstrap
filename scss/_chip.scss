@@ -1,0 +1,83 @@
+// Base class
+//
+// Chips are compact elements that represent an input, attribute, or action.
+
+.chip {
+  // scss-docs-start chip-css-vars
+  --#{$prefix}chip-padding-x: #{$chip-padding-x};
+  --#{$prefix}chip-padding-y: #{$chip-padding-y};
+  --#{$prefix}chip-font-size: #{$chip-font-size};
+  --#{$prefix}chip-font-weight: #{$chip-font-weight};
+  --#{$prefix}chip-color: #{$chip-color};
+  --#{$prefix}chip-bg: #{$chip-bg};
+  --#{$prefix}chip-border-radius: #{$chip-border-radius};
+  --#{$prefix}chip-close-padding-x: #{$chip-close-padding-x};
+  --#{$prefix}chip-close-font-size: #{$chip-close-font-size};
+  --#{$prefix}chip-close-font-weight: #{$chip-close-font-weight};
+  --#{$prefix}chip-close-color: #{$chip-close-color};
+  --#{$prefix}chip-close-opacity: #{$chip-close-opacity};
+  --#{$prefix}chip-close-hover-opacity: #{$chip-close-hover-opacity};
+  // scss-docs-end chip-css-vars
+
+  display: inline-flex;
+  align-items: center;
+  padding: var(--#{$prefix}chip-padding-y) var(--#{$prefix}chip-padding-x);
+  font-size: var(--#{$prefix}chip-font-size);
+  font-weight: var(--#{$prefix}chip-font-weight);
+  line-height: 1;
+  color: var(--#{$prefix}chip-color);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: var(--#{$prefix}chip-bg);
+  @include border-radius(var(--#{$prefix}chip-border-radius));
+
+  // Empty chips collapse automatically
+  &:empty {
+    display: none;
+  }
+
+  // Clickable chips
+  &:is(a, button) {
+    text-decoration: none;
+    cursor: pointer;
+    @include transition(background-color .15s ease-in-out);
+
+    &:hover {
+      background-color: shade-color($chip-bg, 10%);
+    }
+
+    &:focus {
+      outline: 0;
+      box-shadow: 0 0 0 .25rem rgba($chip-bg, .5);
+    }
+  }
+}
+
+// Chip close button
+.chip-close {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--#{$prefix}chip-close-padding-x);
+  margin-left: var(--#{$prefix}chip-close-padding-x);
+  font-size: var(--#{$prefix}chip-close-font-size);
+  font-weight: var(--#{$prefix}chip-close-font-weight);
+  line-height: 1;
+  color: var(--#{$prefix}chip-close-color);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  opacity: var(--#{$prefix}chip-close-opacity);
+
+  &:hover {
+    color: var(--#{$prefix}chip-close-color);
+    text-decoration: none;
+    opacity: var(--#{$prefix}chip-close-hover-opacity);
+  }
+
+  &:focus {
+    outline: 0;
+    opacity: var(--#{$prefix}chip-close-hover-opacity);
+  }
+}

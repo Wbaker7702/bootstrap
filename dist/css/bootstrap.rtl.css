@@ -5132,6 +5132,79 @@ textarea.form-control-lg {
   top: -1px;
 }
 
+.chip {
+  --bs-chip-padding-x: 0.75rem;
+  --bs-chip-padding-y: 0.375rem;
+  --bs-chip-font-size: 0.875rem;
+  --bs-chip-font-weight: 400;
+  --bs-chip-color: #212529;
+  --bs-chip-bg: #e9ecef;
+  --bs-chip-border-radius: var(--bs-border-radius-pill);
+  --bs-chip-close-padding-x: 0.5rem;
+  --bs-chip-close-font-size: 1.25rem;
+  --bs-chip-close-font-weight: 700;
+  --bs-chip-close-color: inherit;
+  --bs-chip-close-opacity: 0.5;
+  --bs-chip-close-hover-opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--bs-chip-padding-y) var(--bs-chip-padding-x);
+  font-size: var(--bs-chip-font-size);
+  font-weight: var(--bs-chip-font-weight);
+  line-height: 1;
+  color: var(--bs-chip-color);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: var(--bs-chip-bg);
+  border-radius: var(--bs-chip-border-radius);
+}
+.chip:empty {
+  display: none;
+}
+.chip:is(a, button) {
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chip:is(a, button) {
+    transition: none;
+  }
+}
+.chip:is(a, button):hover {
+  background-color: rgb(209.7, 212.4, 215.1);
+}
+.chip:is(a, button):focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(233, 236, 239, 0.5);
+}
+
+.chip-close {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--bs-chip-close-padding-x);
+  margin-right: var(--bs-chip-close-padding-x);
+  font-size: var(--bs-chip-close-font-size);
+  font-weight: var(--bs-chip-close-font-weight);
+  line-height: 1;
+  color: var(--bs-chip-close-color);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  opacity: var(--bs-chip-close-opacity);
+}
+.chip-close:hover {
+  color: var(--bs-chip-close-color);
+  text-decoration: none;
+  opacity: var(--bs-chip-close-hover-opacity);
+}
+.chip-close:focus {
+  outline: 0;
+  opacity: var(--bs-chip-close-hover-opacity);
+}
+
 .alert {
   --bs-alert-bg: transparent;
   --bs-alert-padding-x: 1rem;

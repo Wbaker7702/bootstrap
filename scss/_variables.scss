@@ -1519,6 +1519,25 @@ $badge-border-radius:               var(--#{$prefix}border-radius) !default;
 // scss-docs-end badge-variables
 
 
+// Chips
+
+// scss-docs-start chip-variables
+$chip-font-size:                    .875rem !default;
+$chip-font-weight:                  $font-weight-normal !default;
+$chip-color:                        $body-color !default;
+$chip-bg:                           $gray-200 !default;
+$chip-padding-y:                    .375rem !default;
+$chip-padding-x:                    .75rem !default;
+$chip-border-radius:                var(--#{$prefix}border-radius-pill) !default;
+$chip-close-padding-x:              .5rem !default;
+$chip-close-font-size:              1.25rem !default;
+$chip-close-font-weight:            $font-weight-bold !default;
+$chip-close-color:                  inherit !default;
+$chip-close-opacity:                .5 !default;
+$chip-close-hover-opacity:          .75 !default;
+// scss-docs-end chip-variables
+
+
 // Modals
 
 // scss-docs-start modal-variables

@@ -897,13 +897,13 @@
    * Constants
    */
 
-  const NAME$f = 'alert';
-  const DATA_KEY$a = 'bs.alert';
-  const EVENT_KEY$b = `.${DATA_KEY$a}`;
-  const EVENT_CLOSE = `close${EVENT_KEY$b}`;
-  const EVENT_CLOSED = `closed${EVENT_KEY$b}`;
-  const CLASS_NAME_FADE$5 = 'fade';
-  const CLASS_NAME_SHOW$8 = 'show';
+  const NAME$g = 'alert';
+  const DATA_KEY$b = 'bs.alert';
+  const EVENT_KEY$c = `.${DATA_KEY$b}`;
+  const EVENT_CLOSE$1 = `close${EVENT_KEY$c}`;
+  const EVENT_CLOSED$1 = `closed${EVENT_KEY$c}`;
+  const CLASS_NAME_FADE$6 = 'fade';
+  const CLASS_NAME_SHOW$9 = 'show';
 
   /**
    * Class definition
@@ -912,24 +912,24 @@
   class Alert extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$f;
+      return NAME$g;
     }
 
     // Public
     close() {
-      const closeEvent = EventHandler.trigger(this._element, EVENT_CLOSE);
+      const closeEvent = EventHandler.trigger(this._element, EVENT_CLOSE$1);
       if (closeEvent.defaultPrevented) {
         return;
       }
-      this._element.classList.remove(CLASS_NAME_SHOW$8);
-      const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$5);
+      this._element.classList.remove(CLASS_NAME_SHOW$9);
+      const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$6);
       this._queueCallback(() => this._destroyElement(), this._element, isAnimated);
     }
 
     // Private
     _destroyElement() {
       this._element.remove();
-      EventHandler.trigger(this._element, EVENT_CLOSED);
+      EventHandler.trigger(this._element, EVENT_CLOSED$1);
       this.dispose();
     }
 
@@ -963,13 +963,13 @@
    * Constants
    */
 
-  const NAME$e = 'button';
-  const DATA_KEY$9 = 'bs.button';
-  const EVENT_KEY$a = `.${DATA_KEY$9}`;
+  const NAME$f = 'button';
+  const DATA_KEY$a = 'bs.button';
+  const EVENT_KEY$b = `.${DATA_KEY$a}`;
   const DATA_API_KEY$6 = '.data-api';
   const CLASS_NAME_ACTIVE$3 = 'active';
   const SELECTOR_DATA_TOGGLE$5 = '[data-bs-toggle="button"]';
-  const EVENT_CLICK_DATA_API$6 = `click${EVENT_KEY$a}${DATA_API_KEY$6}`;
+  const EVENT_CLICK_DATA_API$6 = `click${EVENT_KEY$b}${DATA_API_KEY$6}`;
 
   /**
    * Class definition
@@ -978,7 +978,7 @@
   class Button extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$e;
+      return NAME$f;
     }
 
     // Public
@@ -1027,13 +1027,13 @@
    * Constants
    */
 
-  const NAME$d = 'swipe';
-  const EVENT_KEY$9 = '.bs.swipe';
-  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$9}`;
-  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$9}`;
-  const EVENT_TOUCHEND = `touchend${EVENT_KEY$9}`;
-  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$9}`;
-  const EVENT_POINTERUP = `pointerup${EVENT_KEY$9}`;
+  const NAME$e = 'swipe';
+  const EVENT_KEY$a = '.bs.swipe';
+  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$a}`;
+  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$a}`;
+  const EVENT_TOUCHEND = `touchend${EVENT_KEY$a}`;
+  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$a}`;
+  const EVENT_POINTERUP = `pointerup${EVENT_KEY$a}`;
   const POINTER_TYPE_TOUCH = 'touch';
   const POINTER_TYPE_PEN = 'pen';
   const CLASS_NAME_POINTER_EVENT = 'pointer-event';
@@ -1074,12 +1074,12 @@
       return DefaultType$c;
     }
     static get NAME() {
-      return NAME$d;
+      return NAME$e;
     }
 
     // Public
     dispose() {
-      EventHandler.off(this._element, EVENT_KEY$9);
+      EventHandler.off(this._element, EVENT_KEY$a);
     }
 
     // Private
@@ -1147,9 +1147,9 @@
    * Constants
    */
 
-  const NAME$c = 'carousel';
-  const DATA_KEY$8 = 'bs.carousel';
-  const EVENT_KEY$8 = `.${DATA_KEY$8}`;
+  const NAME$d = 'carousel';
+  const DATA_KEY$9 = 'bs.carousel';
+  const EVENT_KEY$9 = `.${DATA_KEY$9}`;
   const DATA_API_KEY$5 = '.data-api';
   const ARROW_LEFT_KEY$1 = 'ArrowLeft';
   const ARROW_RIGHT_KEY$1 = 'ArrowRight';
@@ -1159,14 +1159,14 @@
   const ORDER_PREV = 'prev';
   const DIRECTION_LEFT = 'left';
   const DIRECTION_RIGHT = 'right';
-  const EVENT_SLIDE = `slide${EVENT_KEY$8}`;
-  const EVENT_SLID = `slid${EVENT_KEY$8}`;
-  const EVENT_KEYDOWN$1 = `keydown${EVENT_KEY$8}`;
-  const EVENT_MOUSEENTER$1 = `mouseenter${EVENT_KEY$8}`;
-  const EVENT_MOUSELEAVE$1 = `mouseleave${EVENT_KEY$8}`;
-  const EVENT_DRAG_START = `dragstart${EVENT_KEY$8}`;
-  const EVENT_LOAD_DATA_API$3 = `load${EVENT_KEY$8}${DATA_API_KEY$5}`;
-  const EVENT_CLICK_DATA_API$5 = `click${EVENT_KEY$8}${DATA_API_KEY$5}`;
+  const EVENT_SLIDE = `slide${EVENT_KEY$9}`;
+  const EVENT_SLID = `slid${EVENT_KEY$9}`;
+  const EVENT_KEYDOWN$1 = `keydown${EVENT_KEY$9}`;
+  const EVENT_MOUSEENTER$1 = `mouseenter${EVENT_KEY$9}`;
+  const EVENT_MOUSELEAVE$1 = `mouseleave${EVENT_KEY$9}`;
+  const EVENT_DRAG_START = `dragstart${EVENT_KEY$9}`;
+  const EVENT_LOAD_DATA_API$3 = `load${EVENT_KEY$9}${DATA_API_KEY$5}`;
+  const EVENT_CLICK_DATA_API$5 = `click${EVENT_KEY$9}${DATA_API_KEY$5}`;
   const CLASS_NAME_CAROUSEL = 'carousel';
   const CLASS_NAME_ACTIVE$2 = 'active';
   const CLASS_NAME_SLIDE = 'slide';
@@ -1230,7 +1230,7 @@
       return DefaultType$b;
     }
     static get NAME() {
-      return NAME$c;
+      return NAME$d;
     }
 
     // Public
@@ -1528,6 +1528,66 @@
    */
 
   defineJQueryPlugin(Carousel);
+
+  var _Chip;
+
+  /**
+   * Constants
+   */
+
+  const NAME$c = 'chip';
+  const DATA_KEY$8 = 'bs.chip';
+  const EVENT_KEY$8 = `.${DATA_KEY$8}`;
+  const EVENT_CLOSE = `close${EVENT_KEY$8}`;
+  const EVENT_CLOSED = `closed${EVENT_KEY$8}`;
+  const CLASS_NAME_FADE$5 = 'fade';
+  const CLASS_NAME_SHOW$8 = 'show';
+
+  /**
+   * Class definition
+   */
+
+  class Chip extends BaseComponent {
+    // Getters
+    static get NAME() {
+      return NAME$c;
+    }
+
+    // Public
+    close() {
+      const closeEvent = EventHandler.trigger(this._element, EVENT_CLOSE);
+      if (closeEvent.defaultPrevented) {
+        return;
+      }
+      this._element.classList.remove(CLASS_NAME_SHOW$8);
+      const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$5);
+      this._queueCallback(() => this._destroyElement(), this._element, isAnimated);
+    }
+
+    // Private
+    _destroyElement() {
+      this._element.remove();
+      EventHandler.trigger(this._element, EVENT_CLOSED);
+      this.dispose();
+    }
+
+    // Static
+  }
+
+  /**
+   * Data API implementation
+   */
+  _Chip = Chip;
+  Chip.jQueryInterface = getjQueryInterface(_Chip, {
+    passElement: true
+  });
+  enableDismissTrigger(Chip, 'close');
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Chip);
 
   var _Collapse;
 
@@ -4394,6 +4454,7 @@
     Alert,
     Button,
     Carousel,
+    Chip,
     Collapse,
     Dropdown,
     Modal,
