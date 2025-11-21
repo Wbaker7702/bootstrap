@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Chip Component Demo</title>
+  <link rel="stylesheet" href="dist/css/bootstrap.css">
+  <style>
+    body {
+      padding: 2rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .demo-section {
+      margin-bottom: 2rem;
+    }
+    .demo-section h2 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      color: #212529;
+    }
+    .demo-section p {
+      margin-bottom: 1rem;
+      color: #6c757d;
+    }
+    .chip-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">Bootstrap Chip Component Demo</h1>
+    <p class="lead">A new interactive component for displaying compact information.</p>
+
+    <div class="demo-section">
+      <h2>Basic Chips</h2>
+      <p>Simple chips with text labels:</p>
+      <div class="chip-container">
+        <span class="chip">Default Chip</span>
+        <span class="chip">Technology</span>
+        <span class="chip">Design</span>
+        <span class="chip">Marketing</span>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Clickable Chips</h2>
+      <p>Chips can be links or buttons:</p>
+      <div class="chip-container">
+        <a href="#" class="chip">Link Chip</a>
+        <button class="chip">Button Chip</button>
+        <button class="chip">Action Chip</button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Dismissible Chips</h2>
+      <p>Chips with close buttons (click the × to remove):</p>
+      <div class="chip-container">
+        <span class="chip fade show">
+          React
+          <button type="button" class="chip-close" data-bs-dismiss="chip" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </span>
+        <span class="chip fade show">
+          Vue
+          <button type="button" class="chip-close" data-bs-dismiss="chip" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </span>
+        <span class="chip fade show">
+          Angular
+          <button type="button" class="chip-close" data-bs-dismiss="chip" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </span>
+        <span class="chip fade show">
+          Svelte
+          <button type="button" class="chip-close" data-bs-dismiss="chip" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Custom Styled Chips</h2>
+      <p>Chips with custom background colors (using utility classes):</p>
+      <div class="chip-container">
+        <span class="chip bg-primary text-white">Primary</span>
+        <span class="chip bg-secondary text-white">Secondary</span>
+        <span class="chip bg-success text-white">Success</span>
+        <span class="chip bg-danger text-white">Danger</span>
+        <span class="chip bg-warning text-dark">Warning</span>
+        <span class="chip bg-info text-dark">Info</span>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Chips with Icons</h2>
+      <p>Chips can contain icons or emojis:</p>
+      <div class="chip-container">
+        <span class="chip">🎨 Design</span>
+        <span class="chip">💻 Development</span>
+        <span class="chip">📱 Mobile</span>
+        <span class="chip">🚀 Deploy</span>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>JavaScript API Example</h2>
+      <p>Programmatically close a chip:</p>
+      <div class="chip-container mb-3">
+        <span class="chip fade show" id="demoChip">
+          Click button below to remove me
+        </span>
+      </div>
+      <button type="button" class="btn btn-primary" id="closeChipBtn">
+        Close Chip via JavaScript
+      </button>
+    </div>
+
+    <div class="demo-section">
+      <h2>Usage Examples</h2>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">HTML Structure</h5>
+          <pre><code>&lt;!-- Basic chip --&gt;
+&lt;span class="chip"&gt;Label&lt;/span&gt;
+
+&lt;!-- Clickable chip --&gt;
+&lt;a href="#" class="chip"&gt;Link&lt;/a&gt;
+&lt;button class="chip"&gt;Button&lt;/button&gt;
+
+&lt;!-- Dismissible chip --&gt;
+&lt;span class="chip fade show"&gt;
+  Label
+  &lt;button type="button" class="chip-close" data-bs-dismiss="chip"&gt;
+    &lt;span aria-hidden="true"&gt;×&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/span&gt;</code></pre>
+
+          <h5 class="card-title mt-4">JavaScript API</h5>
+          <pre><code>// Initialize
+const chipElement = document.querySelector('.chip')
+const chip = new bootstrap.Chip(chipElement)
+
+// Close
+chip.close()
+
+// Dispose
+chip.dispose()
+
+// Events
+chipElement.addEventListener('close.bs.chip', function (event) {
+  // Do something before chip closes
+})
+
+chipElement.addEventListener('closed.bs.chip', function (event) {
+  // Do something after chip is closed
+})</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="dist/js/bootstrap.bundle.js"></script>
+  <script>
+    // JavaScript API example
+    document.getElementById('closeChipBtn').addEventListener('click', function() {
+      const chipElement = document.getElementById('demoChip')
+      if (chipElement) {
+        const chip = bootstrap.Chip.getOrCreateInstance(chipElement)
+        chip.close()
+      }
+    })
+
+    // Log when chips are closed
+    document.addEventListener('closed.bs.chip', function(event) {
+      console.log('Chip closed:', event.target)
+    })
+  </script>
+</body>
+</html>

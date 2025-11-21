@@ -1566,8 +1566,8 @@
 
     // Private
     _destroyElement() {
-      this._element.remove();
       EventHandler.trigger(this._element, EVENT_CLOSED);
+      this._element.remove();
       this.dispose();
     }
 

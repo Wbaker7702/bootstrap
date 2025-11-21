@@ -5140,6 +5140,9 @@ textarea.form-control-lg {
   --bs-chip-color: #212529;
   --bs-chip-bg: #e9ecef;
   --bs-chip-border-radius: var(--bs-border-radius-pill);
+  --bs-chip-hover-bg-shade-amount: 10%;
+  --bs-chip-focus-width: 0.25rem;
+  --bs-chip-focus-opacity: 0.5;
   --bs-chip-close-padding-x: 0.5rem;
   --bs-chip-close-font-size: 1.25rem;
   --bs-chip-close-font-weight: 700;
@@ -5177,7 +5180,7 @@ textarea.form-control-lg {
 }
 .chip:is(a, button):focus {
   outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(233, 236, 239, 0.5);
+  box-shadow: 0 0 0 var(--bs-chip-focus-width) rgba(233, 236, 239, var(--bs-chip-focus-opacity));
 }
 
 .chip-close {

@@ -11,6 +11,9 @@
   --#{$prefix}chip-color: #{$chip-color};
   --#{$prefix}chip-bg: #{$chip-bg};
   --#{$prefix}chip-border-radius: #{$chip-border-radius};
+  --#{$prefix}chip-hover-bg-shade-amount: #{$chip-hover-bg-shade-amount};
+  --#{$prefix}chip-focus-width: #{$chip-focus-width};
+  --#{$prefix}chip-focus-opacity: #{$chip-focus-opacity};
   --#{$prefix}chip-close-padding-x: #{$chip-close-padding-x};
   --#{$prefix}chip-close-font-size: #{$chip-close-font-size};
   --#{$prefix}chip-close-font-weight: #{$chip-close-font-weight};
@@ -44,12 +47,12 @@
     @include transition(background-color .15s ease-in-out);
 
     &:hover {
-      background-color: shade-color($chip-bg, 10%);
+      background-color: shade-color($chip-bg, $chip-hover-bg-shade-amount);
     }
 
     &:focus {
       outline: 0;
-      box-shadow: 0 0 0 .25rem rgba($chip-bg, .5);
+      box-shadow: 0 0 0 var(--#{$prefix}chip-focus-width) rgba($chip-bg, var(--#{$prefix}chip-focus-opacity));
     }
   }
 }
