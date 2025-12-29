@@ -8,19 +8,25 @@
             "type": "shell",
             "command": "msbuild",
             "args": [
-                // Ask msbuild to generate full paths for file names.
                 "/property:GenerateFullPaths=true",
                 "/t:build",
-                // Do not generate summary otherwise it leads to duplicate errors in Problems panel
                 "/consoleloggerparameters:NoSummary"
             ],
             "group": "build",
             "presentation": {
-                // Reveal the output only if unrecognized errors occur.
                 "reveal": "silent"
             },
-            // Use the standard MS compiler pattern to detect errors, warnings and infos
             "problemMatcher": "$msCompile"
+        },
+        {
+            "type": "virtual-hardware.run",
+            "program": "${command:virtual-hardware.getBinaryFile}",
+            "model": "${command:virtual-hardware.getModel}",
+            "problemMatcher": [
+                "$swa-watch"
+            ],
+            "label": "virtual-hardware.run: Run Program",
+            "isBackground": true
         }
     ]
 }
