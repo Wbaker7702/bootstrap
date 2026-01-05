@@ -6,9 +6,11 @@ main {
   input,
   select,
   textarea,
+  h1,
   h2,
   h3,
   h4,
+  [id="content"],
   [tabindex="0"] {
     scroll-margin-top: 80px;
     scroll-margin-bottom: 100px;
