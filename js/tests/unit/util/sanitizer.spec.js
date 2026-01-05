@@ -159,5 +159,12 @@ describe('Sanitizer', () => {
       expect(firstResult).toContain('src')
       expect(secondResult).toContain('src')
     })
+
+    it('should allow data-bs- attributes', () => {
+      const template = '<div data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top">Tooltip on top</div>'
+      const result = sanitizeHtml(template, DefaultAllowlist, null)
+      expect(result).toContain('data-bs-toggle="tooltip"')
+      expect(result).toContain('data-bs-placement="top"')
+    })
   })
 })
