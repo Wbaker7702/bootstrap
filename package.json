@@ -61,7 +61,7 @@
     "js-compile-standalone-esm": "rollup --environment ESM:true,BUNDLE:false --config build/rollup.config.mjs --sourcemap",
     "js-compile-bundle": "rollup --environment BUNDLE:true --config build/rollup.config.mjs --sourcemap",
     "js-compile-plugins": "node build/build-plugins.mjs",
-    "js-lint": "eslint --cache --cache-location .cache/.eslintcache --report-unused-disable-directives .",
+    "js-lint": "eslint --cache --cache-location .cache/.eslintcache --report-unused-disable-directives-severity warn .",
     "js-minify": "npm-run-all --aggregate-output --parallel js-minify-*",
     "js-minify-standalone": "terser --compress passes=2 --mangle --comments \"/^!/\" --source-map \"content=dist/js/bootstrap.js.map,includeSources,url=bootstrap.min.js.map\" --output dist/js/bootstrap.min.js dist/js/bootstrap.js",
     "js-minify-standalone-esm": "terser --compress passes=2 --mangle --comments \"/^!/\" --source-map \"content=dist/js/bootstrap.esm.js.map,includeSources,url=bootstrap.esm.min.js.map\" --output dist/js/bootstrap.esm.min.js dist/js/bootstrap.esm.js",
@@ -83,7 +83,7 @@
     "docs-prettier-format": "prettier --config site/.prettierrc.json --write --cache site",
     "docs-serve": "npm run astro-dev",
     "docs-serve-only": "npx sirv-cli _site --port 9001",
-    "lockfile-lint": "lockfile-lint --allowed-hosts npm --allowed-schemes https: --empty-hostname false --type npm --path package-lock.json",
+    "lockfile-lint": "lockfile-lint --allowed-hosts npm github.com --allowed-schemes https: git+ssh: --empty-hostname false --type npm --path package-lock.json",
     "update-deps": "ncu -u -x @docsearch/js,eslint,eslint-config-xo,eslint-plugin-unicorn,karma-browserstack-launcher,karma-rollup-preprocessor,sass",
     "release": "npm-run-all dist release-sri docs-build release-zip*",
     "release-sri": "node build/generate-sri.mjs",
@@ -210,5 +210,8 @@
     "peerDependencies": {
       "@popperjs/core": "^2.11.8"
     }
+  },
+  "overrides": {
+    "@emmetio/css-parser": "0.4.0"
   }
 }
