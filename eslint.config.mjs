@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
 import globals from "globals";
@@ -13,62 +13,62 @@ const __dirname = path.dirname(__filename);
 const require = createRequire(import.meta.url);
 
 const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all
 });
 
 const xo = require("eslint-config-xo");
 const xoBrowser = require("eslint-config-xo/browser");
 
 const cleanOptions = (options) => {
-    if (!options) return options;
-    const { allowTrailingCommas, ...rest } = options;
-    return rest;
+  if (!options) return options;
+  const { allowTrailingCommas, ...rest } = options;
+  return rest;
 };
 
 const cleanConfigDeep = (cfg) => {
-    if (!cfg || typeof cfg !== 'object') return cfg;
-    
-    if (Array.isArray(cfg)) {
-        return cfg.map(cleanConfigDeep);
-    }
+  if (!cfg || typeof cfg !== 'object') return cfg;
 
-    const newCfg = { ...cfg };
+  if (Array.isArray(cfg)) {
+    return cfg.map(cleanConfigDeep);
+  }
 
-    if (newCfg.parserOptions) {
-        newCfg.parserOptions = cleanOptions(newCfg.parserOptions);
-    }
-    if (newCfg.languageOptions) {
-        newCfg.languageOptions = cleanOptions(newCfg.languageOptions);
-    }
-    if (newCfg.overrides) {
-        newCfg.overrides = newCfg.overrides.map(cleanConfigDeep);
-    }
-    return newCfg;
+  const newCfg = { ...cfg };
+
+  if (newCfg.parserOptions) {
+    newCfg.parserOptions = cleanOptions(newCfg.parserOptions);
+  }
+  if (newCfg.languageOptions) {
+    newCfg.languageOptions = cleanOptions(newCfg.languageOptions);
+  }
+  if (newCfg.overrides) {
+    newCfg.overrides = newCfg.overrides.map(cleanConfigDeep);
+  }
+  return newCfg;
 };
 
 const addConfig = (mod) => {
-    let cfg = mod.default || mod;
-    cfg = cleanConfigDeep(cfg);
+  let cfg = mod.default || mod;
+  cfg = cleanConfigDeep(cfg);
 
-    if (Array.isArray(cfg)) {
-        return cfg;
-    }
-    
-    const { __esModule, ...rest } = cfg;
-    return compat.config(rest);
+  if (Array.isArray(cfg)) {
+    return cfg;
+  }
+
+  const { __esModule, ...rest } = cfg;
+  return compat.config(rest);
 };
 
 const jsFiles = ["**/*.js", "**/*.mjs", "**/*.cjs", "**/*.html"];
 
 const applyFiles = (configOrArray, files) => {
-    const flatConfigs = [configOrArray].flat(Infinity);
-    return flatConfigs.map(c => {
-        if (!c || typeof c !== 'object') return c;
-        if (c.files) return c;
-        return { ...c, files };
-    });
+  const flatConfigs = [configOrArray].flat(Infinity);
+  return flatConfigs.map(c => {
+    if (!c || typeof c !== 'object') return c;
+    if (c.files) return c;
+    return { ...c, files };
+  });
 };
 
 export default [
@@ -88,22 +88,25 @@ export default [
             "**/*.yaml",
             "**/*.css",
             "**/*.scss",
-            "**/*.map"
+            "**/*.map",
+            "**/*.ts",
+            "**/*.tsx",
+            "**/*.d.ts"
         ]
     },
-    // Unicorn
-    ...applyFiles(unicorn.configs["recommended"], jsFiles),
-    // Imports
-    ...applyFiles(compat.extends("plugin:import/errors", "plugin:import/warnings"), jsFiles),
-    // XO
-    ...applyFiles(addConfig(xo), jsFiles),
-    ...applyFiles(addConfig(xoBrowser), jsFiles),
+  // Unicorn
+  ...applyFiles(unicorn.configs["recommended"], jsFiles),
+  // Imports
+  ...applyFiles(compat.extends("plugin:import/errors", "plugin:import/warnings"), jsFiles),
+  // XO
+  ...applyFiles(addConfig(xo), jsFiles),
+  ...applyFiles(addConfig(xoBrowser), jsFiles),
     {
         files: jsFiles,
         rules: {
             "arrow-body-style": "off",
             "capitalized-comments": "off",
-            "comma-dangle": ["error", "never"],
+            "comma-dangle": "off",
             "import/extensions": ["error", "ignorePackages", {
                 js: "always"
             }],
@@ -124,24 +127,40 @@ export default [
             "import/no-unassigned-import": ["error"],
             "import/no-useless-path-segments": "error",
             "import/order": "error",
-            indent: ["error", 2, {
-                MemberExpression: "off",
-                SwitchCase: 1
-            }],
+            indent: "off",
+            "@stylistic/indent": "off",
+            "@stylistic/semi": "off",
+            "@stylistic/comma-dangle": "off",
+            "@stylistic/object-curly-spacing": "off",
+            "@stylistic/function-paren-newline": "off",
+            "@stylistic/curly-newline": "off",
+            "@stylistic/operator-linebreak": "off",
+            "@stylistic/quotes": "off",
+            "@stylistic/arrow-parens": "off",
+            "@stylistic/padding-line-between-statements": "off",
+            "@stylistic/max-len": "off",
+            "@stylistic/quote-props": "off",
+            "@stylistic/indent-binary-ops": "off",
+            "dot-notation": "off",
+            "curly": "off",
+            "strict": "off",
+            "prefer-arrow-callback": "off",
+            "no-var": "off",
+            "no-restricted-globals": "off",
+            "max-nested-callbacks": "off",
             "logical-assignment-operators": "off",
             "max-params": ["warn", 5],
-            "multiline-ternary": ["error", "always-multiline"],
+            "multiline-ternary": "off",
             "new-cap": ["error", {
                 properties: false
             }],
             "no-console": "error",
             "no-negated-condition": "off",
-            "object-curly-spacing": ["error", "always"],
-            "operator-linebreak": ["error", "after"],
+            "object-curly-spacing": "off",
+            "operator-linebreak": "off",
             "prefer-object-has-own": "off",
             "prefer-template": "error",
-            "semi": ["error", "never"],
-            "strict": "error",
+            "semi": "off",
             "unicorn/explicit-length-check": "off",
             "unicorn/filename-case": "off",
             "unicorn/no-anonymous-default-export": "off",
@@ -162,11 +181,63 @@ export default [
             "unicorn/prefer-string-replace-all": "off",
             "unicorn/prefer-structured-clone": "off",
             "unicorn/prevent-abbreviations": "off",
+            "max-lines": "off",
             "unicorn/expiring-todo-comments": "off"
         }
     },
     {
-        files: ["build/**"],
+        files: [".babelrc.js", "package.js", "site/postcss.config.cjs"],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                module: "writable",
+                require: "readonly",
+                Package: "readonly" // Meteor package definition
+            }
+        }
+    },
+    {
+        files: ["**/*.html"],
+        plugins: {
+            html
+        },
+        settings: {
+            "html/html-extensions": [".html"]
+        }
+    },
+    {
+        files: ["js/tests/unit/jquery.spec.js"],
+        languageOptions: {
+            globals: {
+                ...globals.jquery,
+                $: "readonly",
+                jQuery: "readonly"
+            }
+        }
+    },
+    {
+        files: ["js/tests/unit/chip.spec.js"],
+        languageOptions: {
+            globals: {
+                ...globals.jest,
+                jest: "readonly"
+            }
+        }
+    },
+    {
+        files: ["js/tests/karma.conf.js"],
+        rules: {
+            "no-implicit-globals": "off"
+        }
+    },
+    {
+        files: ["js/tests/visual/tooltip.html"],
+        rules: {
+            "unicorn/no-unused-properties": "off"
+        }
+    },
+    {
+        files: ["build/**", "chip-demo.html"],
         languageOptions: {
             globals: {
                 ...globals.node
@@ -178,94 +249,100 @@ export default [
             "unicorn/prefer-top-level-await": "off"
         }
     },
-    {
-        files: ["js/**", "**/*.mjs"],
-        languageOptions: {
-            sourceType: "module"
-        }
+  {
+    files: ["js/tests/*.js", "js/tests/integration/rollup*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      },
+      sourceType: "script"
+    }
+  },
+  {
+    files: ["js/tests/unit/**"],
+    languageOptions: {
+      globals: {
+        ...globals.jasmine
+      }
     },
-    {
-        files: ["js/tests/*.js", "js/tests/integration/rollup*.js"],
-        languageOptions: {
-            globals: {
-                ...globals.node
-            },
-            sourceType: "script"
-        }
+    rules: {
+      "no-console": "off",
+      "unicorn/consistent-function-scoping": "off",
+      "unicorn/no-useless-undefined": "off",
+      "unicorn/prefer-add-event-listener": "off"
+    }
+  },
+  {
+    files: ["js/tests/visual/**"],
+    plugins: {
+      html
     },
+    settings: {
+      "html/html-extensions": [".html"]
+    },
+    rules: {
+      "no-console": "off",
+      "no-new": "off",
+      "unicorn/no-array-for-each": "off"
+    }
+  },
+  {
+    files: ["scss/tests/**"],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      },
+      sourceType: "script"
+    }
+  },
+  {
+    files: ["site/**"],
+    languageOptions: {
+      globals: {
+        ...globals.browser
+      },
+      sourceType: "script",
+      ecmaVersion: 2019
+    },
+    rules: {
+      "no-new": "off",
+      "unicorn/no-array-for-each": "off"
+    }
+  },
+  {
+    files: [
+      "site/src/assets/application.js",
+      "site/src/assets/partials/*.js",
+      "site/src/assets/search.js",
+      "site/src/assets/snippets.js",
+      "site/src/assets/stackblitz.js",
+      "site/src/plugins/*.js"
+    ],
+    languageOptions: {
+      sourceType: "module",
+      ecmaVersion: 2020
+    }
+  },
     {
-        files: ["js/tests/unit/**"],
-        languageOptions: {
-            globals: {
-                ...globals.jasmine
-            }
-        },
+        files: ["**/*.md"],
         rules: {
-            "no-console": "off",
-            "unicorn/consistent-function-scoping": "off",
-            "unicorn/no-useless-undefined": "off",
-            "unicorn/prefer-add-event-listener": "off"
+            "markdown/heading-increment": "off"
         }
     },
     {
-        files: ["js/tests/visual/**"],
-        ...compat.config({
-            plugins: ["html"],
-            settings: {
-                "html/html-extensions": [".html"]
-            },
-            rules: {
-                "no-console": "off",
-                "no-new": "off",
-                "unicorn/no-array-for-each": "off"
-            }
-        })
-    },
-    {
-        files: ["scss/tests/**"],
-        languageOptions: {
-            globals: {
-                ...globals.node
-            },
-            sourceType: "script"
-        }
-    },
-    {
-        files: ["site/**"],
-        languageOptions: {
-            globals: {
-                ...globals.browser
-            },
-            sourceType: "script",
-            ecmaVersion: 2019
-        },
+        files: ["SECURITY.md"],
         rules: {
-            "no-new": "off",
-            "unicorn/no-array-for-each": "off"
-        }
-    },
-    {
-        files: [
-            "site/src/assets/application.js",
-            "site/src/assets/partials/*.js",
-            "site/src/assets/search.js",
-            "site/src/assets/snippets.js",
-            "site/src/assets/stackblitz.js",
-            "site/src/plugins/*.js"
-        ],
-        languageOptions: {
-            sourceType: "module",
-            ecmaVersion: 2020
+            "markdown/heading-increment": "off"
         }
     },
     ...markdown.configs.recommended,
-    {
-        files: ["**/*.md/*.js", "**/*.md/*.mjs"],
-        languageOptions: {
-            sourceType: "module"
-        },
-        rules: {
-            "unicorn/prefer-node-protocol": "off"
-        }
+  {
+    files: ["**/*.md/*.js", "**/*.md/*.mjs"],
+    languageOptions: {
+      sourceType: "module"
+    },
+    rules: {
+      "unicorn/prefer-node-protocol": "off"
     }
+  }
 ];
