@@ -178,7 +178,7 @@
     "sass": "1.97.2",
     "sass-true": "^10.0.0",
     "shelljs": "^0.10.0",
-    "stylelint": "^16.25.0",
+    "stylelint": "^17.0.0",
     "stylelint-config-twbs-bootstrap": "^16.1.0",
     "terser": "^5.44.0",
     "typescript": "^5.9.3",
