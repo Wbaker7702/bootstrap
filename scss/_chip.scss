@@ -55,6 +55,17 @@
       box-shadow: 0 0 0 var(--#{$prefix}chip-focus-width) rgba($chip-bg, var(--#{$prefix}chip-focus-opacity));
     }
   }
+
+  // Chip with image/avatar
+  .chip-img {
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: var(--#{$prefix}chip-padding-x);
+    // stylelint-disable-next-line function-disallowed-list
+    margin-left: calc(var(--#{$prefix}chip-padding-x) * -.5);
+    object-fit: cover;
+    @include border-radius(50%);
+  }
 }
 
 // Chip close button
@@ -81,6 +92,8 @@
 
   &:focus {
     outline: 0;
+    // Add focus ring for accessibility
+    box-shadow: 0 0 0 var(--#{$prefix}chip-focus-width) rgba($black, var(--#{$prefix}chip-focus-opacity));
     opacity: var(--#{$prefix}chip-close-hover-opacity);
   }
 }
