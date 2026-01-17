@@ -5182,6 +5182,15 @@ textarea.form-control-lg {
   outline: 0;
   box-shadow: 0 0 0 var(--bs-chip-focus-width) rgba(233, 236, 239, var(--bs-chip-focus-opacity));
 }
+.chip .chip-img {
+  margin-right: calc(var(--bs-chip-padding-x) * -0.5);
+  margin-left: var(--bs-chip-padding-x);
+  height: 1.5em;
+  width: 1.5em;
+  border-radius: 50%;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
 
 .chip-close {
   display: inline-flex;
@@ -5206,6 +5215,7 @@ textarea.form-control-lg {
 .chip-close:focus {
   outline: 0;
   opacity: var(--bs-chip-close-hover-opacity);
+  box-shadow: 0 0 0 var(--bs-chip-focus-width) rgba(0, 0, 0, var(--bs-chip-focus-opacity));
 }
 
 .alert {
