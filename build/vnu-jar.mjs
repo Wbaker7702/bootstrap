@@ -41,6 +41,13 @@ execFile('java', ['-version'], (error, stdout, stderr) => {
   ].join('|')
 
   const args = [
+    '-Dhttp.proxyHost=127.0.0.1',
+    '-Dhttp.proxyPort=9',
+    '-Dhttps.proxyHost=127.0.0.1',
+    '-Dhttps.proxyPort=9',
+    '-Dftp.proxyHost=127.0.0.1',
+    '-Dftp.proxyPort=9',
+    '-Dhttp.nonProxyHosts=',
     '-jar',
     `"${vnu}"`,
     '--asciiquotes',
