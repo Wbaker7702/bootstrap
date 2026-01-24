@@ -213,6 +213,6 @@
   },
   "overrides": {
     "@emmetio/css-parser": "0.4.0",
-    "lodash": "^4.17.23"
+    "lodash": "^4.17.21"
   }
 }
